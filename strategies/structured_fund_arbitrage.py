@@ -8,11 +8,15 @@ from easyquant import StrategyTemplate
 class Strategy(StrategyTemplate):
     def __init__(self, user):
         super().__init__(user)
+        self.log.info('*NOTE*: The log of current strategy will be redirected to /tmp/strategy.log')
         self.log = Logger(self.__class__.__name__)
         handler = TimedRotatingFileHandler('/tmp/strategy.log',
                                    date_format='%Y-%m-%d')
         self.log.handlers.append(handler)
         self.log.handlers.append(StreamHandler(sys.stdout))
+
+        # 以代码为key, (origin_fund, a_fund, b_fund)三元组为value，存储历史数据
+        self.history_data = {}
 
     def strategy(self, event):
         self.arbitrage(event.data, 502013, 5)
@@ -24,6 +28,17 @@ class Strategy(StrategyTemplate):
         origin_fund = str(code)
         a_fund = str(code + 1)
         b_fund = str(code + 2)
+        if self.history_data.get(origin_fund):
+            # 存在上次数据，比较是否一样
+            history = self.history_data[origin_fund]
+            identical = True
+            for old_data, new_data in zip(history, (data[origin_fund], data[a_fund], data[b_fund])):
+                identical &= (old_data == new_data)
+            if identical:
+                self.log.info("Skipping %s due to data repeating." % code)
+                return
+        else:
+            self.history_data[origin_fund] = (data[origin_fund], data[a_fund], data[b_fund])
 
         # 确定是分拆套利还是合并套利，分拆套利用的是母基金的卖榜数据和分级基金的买榜数据，合并套利这是相反
         # 判断是否可以进行合并套利：按卖1价买入1份额的a基金和1份额的b基金进行合并，按母基金买1价进行卖出
