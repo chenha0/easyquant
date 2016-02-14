@@ -14,7 +14,6 @@ class Strategy(StrategyTemplate):
         self.log.handlers.append(handler)
         self.log.handlers.append(StreamHandler(sys.stdout))
 
-
     def strategy(self, event):
         self.arbitrage(event.data, 502013, 5)
 
@@ -69,7 +68,7 @@ class Strategy(StrategyTemplate):
                         a_fund_index += 1
                     elif fund == 'b':
                         b_fund_index += 1
-                    elif fund == 'origin':    
+                    elif fund == 'origin':
                         origin_fund_index += 1
 
     def split(self, data, origin_fund, origin_fund_vol, a_fund, a_fund_vol, b_fund, b_fund_vol, level):
@@ -82,6 +81,7 @@ class Strategy(StrategyTemplate):
             origin_fund_price = float(data[origin_fund][self.ask(origin_fund_index)])
             a_fund_price = float(data[a_fund][self.bid(a_fund_index)])
             b_fund_price = float(data[b_fund][self.bid(b_fund_index)])
+
             if origin_fund_price * 20002 < (a_fund_price + b_fund_price) * 9999:
                 split_vol, fund = self.min(origin_fund_vol[origin_fund_index], \
                     a_fund_vol[a_fund_index], b_fund_vol[b_fund_index])
@@ -98,8 +98,10 @@ class Strategy(StrategyTemplate):
                         a_fund_index += 1
                     elif fund == 'b':
                         b_fund_index += 1
-                    elif fund == 'origin':    
-                        origin_fund_index += 1        
+                    elif fund == 'origin':
+                        origin_fund_index += 1
+            else:
+                break
 
     def min(self, origin_fund_vol, a_fund_vol, b_fund_vol):
         vol = 0
@@ -125,10 +127,10 @@ class Strategy(StrategyTemplate):
         return vol, fund
 
     def bid(self, index):
-        return ('bid' + str(index))
+        return 'bid' + str(index)
 
     def ask(self, index):
-        return ('ask' + str(index))
+        return 'ask' + str(index)
 
     # 将买卖数据放入数组中
     def fetch_volume(self, data, code, prefix, level):
@@ -150,4 +152,4 @@ class Strategy(StrategyTemplate):
             flag &= (prefix + str(index)) in data[str(code)] and \
                 (prefix + str(index) + '_volume') in data[str(code)]
         return flag
-        
+
