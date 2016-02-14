@@ -174,4 +174,3 @@ class Strategy(StrategyTemplate):
             flag &= (prefix + str(index)) in data[str(code)] and \
                 (prefix + str(index) + '_volume') in data[str(code)]
         return flag
-
