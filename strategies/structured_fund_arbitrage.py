@@ -92,6 +92,8 @@ class Strategy(StrategyTemplate):
                         b_fund_index += 1
                     elif fund == 'origin':
                         origin_fund_index += 1
+            else:
+                break
 
     def split(self, data, origin_fund, origin_fund_vol, a_fund, a_fund_vol, b_fund, b_fund_vol, level):
         origin_fund_index = 1
