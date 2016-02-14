@@ -18,8 +18,11 @@ class MainEngine:
     def __init__(self, broker, need_data='me.json'):
         """初始化事件 / 行情 引擎并启动事件引擎
         """
-        self.user = easytrader.use(broker)
-        self.user.prepare(need_data)
+        if need_data:
+            self.user = easytrader.use(broker)
+            self.user.prepare(need_data)
+        else:
+            self.user = None
 
         self.event_engine = EventEngine()
         self.quotation_engine = Quotation(self.event_engine)
