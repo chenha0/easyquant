@@ -33,6 +33,7 @@ class Strategy(StrategyTemplate):
         origin_fund = str(code)
         a_fund = str(code + 1)
         b_fund = str(code + 2)
+        print(origin_fund)
         if self.history_data.get(origin_fund):
             # 存在上次数据，比较是否一样
             history = self.history_data[origin_fund]
