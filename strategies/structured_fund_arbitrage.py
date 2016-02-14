@@ -3,7 +3,12 @@ from easyquant import StrategyTemplate
 
 class Strategy(StrategyTemplate):
     def strategy(self, event):
+        self.arbitrage(event.data, 502003, 5)
+        self.arbitrage(event.data, 502006, 5)
+        self.arbitrage(event.data, 502010, 5)
         self.arbitrage(event.data, 502013, 5)
+        self.arbitrage(event.data, 502036, 5)
+        self.arbitrage(event.data, 502048, 5)
 
     def arbitrage(self, data, code, level):
         if not self.is_valid_structured_fund(data, code, level):
@@ -46,8 +51,9 @@ class Strategy(StrategyTemplate):
 
                 if merge_vol > 0:
                     rate = origin_fund_price * 199.96 / (a_fund_price + b_fund_price) - 100.0
-                    self.log.info('Merge Shares: %f, Origin: %f, A: %f, B: %f, Rate: %.2f%%' % \
-                                (merge_vol, origin_fund_price, a_fund_price, b_fund_price, rate))
+                    self.log.info('Merge Shares: %d, Rate: %.2f%%, %s: %f, %s: %f, %s: %f' % \
+                                (merge_vol, rate, origin_fund, origin_fund_price, 
+                                a_fund, a_fund_price, b_fund, b_fund_price))
 
                     origin_fund_vol[origin_fund_index] -= merge_vol
                     a_fund_vol[a_fund_index] -= merge_vol
@@ -76,8 +82,9 @@ class Strategy(StrategyTemplate):
 
                 if split_vol > 0:
                     rate = (a_fund_price + b_fund_price) * 49.99 / origin_fund_price - 100.0
-                    self.log.info('Split Shares: %f, Origin: %f, A: %f, B: %f, Rate: %.2f%%' % \
-                                (split_vol, origin_fund_price, a_fund_price, b_fund_price, rate))
+                    self.log.info('Split Shares: %d, Rate: %.2f%%, %s: %f, %s: %f, %s: %f' % \
+                                (split_vol, rate, origin_fund, origin_fund_price, 
+                                a_fund, a_fund_price, b_fund, b_fund_price))
 
                     origin_fund_vol[origin_fund_index] -= split_vol
                     a_fund_vol[a_fund_index] -= split_vol
@@ -122,7 +129,7 @@ class Strategy(StrategyTemplate):
 
     # 将买卖数据放入数组中
     def fetch_volume(self, data, code, prefix, level):
-        vol = [0] # 填充index=0的数据，方便使用
+        vol = [0] # 填充index = 0的数据，方便使用
         for index in range(1, level + 1):
             vol.append(int(data[code][prefix + str(index) + '_volume']))
         return vol
